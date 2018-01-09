@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Uploads</title>
+</head>
+<body>
+    {% if args["method"] == "POST" %}
+        {% if args["file_size_error"] %}
+            <h1>Размер файла превышает 1мб.!</h1>
+        {% else %}
+            <h1>Файл успешно загружен.</h1>
+        {% endif %}
+    {% endif %}
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <!--Select files to upload: <input type="file" name="file[]" multiple>-->
+        Select files to upload: <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+</body>
+</html>
