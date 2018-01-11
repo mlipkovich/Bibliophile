@@ -1,5 +1,5 @@
 from flask import Flask
-from flask.app import uploader
+from app.upload_book.controllers import uploader
 
 app = Flask(__name__)
 

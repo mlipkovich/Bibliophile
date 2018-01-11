@@ -1,6 +1,6 @@
 import re
-from flask.app import Lemmatizer
 from flask import Blueprint, render_template, request
+from app.upload_book.lemmatizer import Lemmatizer
 
 MAX_FILE_SIZE = 1024 * 1024 + 1
 
