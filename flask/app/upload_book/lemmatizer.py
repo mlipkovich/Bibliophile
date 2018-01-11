@@ -7,7 +7,7 @@ from nltk.corpus import stopwords
 
 class Lemmatizer():
 
-    STOPWORDS = stopwords.words('ENGLISH')
+    STOPWORDS = stopwords.words('english')
     ADVERB_TO_ADJECTIVE_THRESH = 0.8
     WORD_NET_LEMMATIZER = WordNetLemmatizer()
 

@@ -1,6 +1,11 @@
+# TODO: Do not run pip install on each docker run; use absolute paths
+
 FROM ubuntu:16.04
 
-RUN apt install -y python3=3.5.* \
+RUN apt-get update -qq && \
+    apt-get upgrade -qqy
+
+RUN apt-get install -qqy python3=3.5.* \
     python3-dev=3.5.* \
     python3-pip \
     python-virtualenv \
@@ -13,9 +18,9 @@ ADD ./nginx/bibliophile /etc/nginx/sites-available/
 RUN ln -s /etc/nginx/sites-available/bibliophile /etc/nginx/sites-enabled
 RUN service nginx reload
 
-# Configure script for running the gunicorn
-WORKDIR /srv/app
-ADD ./start.sh /srv/start.sh
-RUN chmod +x /srv/start.sh
+EXPOSE 5000
 
-ENTRYPOINT ["/bin/bash", "/srv/start.sh"]
+ADD ./start.sh /code/start.sh
+WORKDIR /code
+RUN chmod +x ./start.sh
+ENTRYPOINT ["/bin/bash", "./start.sh"]
