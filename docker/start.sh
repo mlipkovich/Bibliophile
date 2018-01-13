@@ -10,6 +10,6 @@ pip install -r ./flask/requirements.txt
 python ./flask/nltk_download.py
 
 export LOG_DIR=/var/log/bibliophile
-mkdir -p LOG_DIR
+mkdir -p ${LOG_DIR}
 
 gunicorn --chdir ./flask --workers 4 --bind 0.0.0.0:5000 run:app
