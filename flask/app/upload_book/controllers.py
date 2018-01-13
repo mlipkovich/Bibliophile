@@ -1,4 +1,5 @@
 import re
+import logging
 from flask import Blueprint, render_template, request
 from app.upload_book.lemmatizer import Lemmatizer
 
@@ -8,6 +9,8 @@ uploader = Blueprint('uploader', __name__)
 
 lemmatizer = Lemmatizer()
 alphanumeric_pattern = re.compile('[\W_]+', re.UNICODE)
+
+logger = logging.getLogger(__name__)
 
 
 @uploader.errorhandler(413)
@@ -67,5 +70,5 @@ def count_number_of_words(file_content):
     no_stopwords_count = len(no_stopwords)
     lemmatized_count = len(lemmatized)
     converted_lemmatized_count = len(converted_lemmatized)
-    print("Total count: %s; no stop words: %s; lemmatized: %s; converted lemmatized %s" %
+    logger.info("Total count: %s; no stop words: %s; lemmatized: %s; converted lemmatized %s" %
                  (total_count, no_stopwords_count, lemmatized_count, converted_lemmatized_count))

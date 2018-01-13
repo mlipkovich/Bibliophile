@@ -11,6 +11,8 @@ class Lemmatizer():
     ADVERB_TO_ADJECTIVE_THRESH = 0.8
     WORD_NET_LEMMATIZER = WordNetLemmatizer()
 
+    logger = logging.getLogger(__name__)
+
     def is_stopword(self, word):
         return word in self.STOPWORDS
 
@@ -48,7 +50,7 @@ class Lemmatizer():
             return ''
 
         if len(changed_words) > 1:
-            logging.warning("More than one lemma for word '%s': %s" % (word, changed_words))
+            self.logger.warning("More than one lemma for word '%s': %s" % (word, changed_words))
 
         return changed_words.pop()
 
