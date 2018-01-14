@@ -7,14 +7,15 @@
 <body>
     {% if args["method"] == "POST" %}
         {% if args["file_size_error"] %}
-            <h1>Размер файла превышает 1мб.!</h1>
+            <h1>File size is exceeding 1mb</h1>
         {% else %}
-            <h1>Файл успешно загружен.</h1>
+            {% for key, value in args["stats"].items() %}
+                <h1>{{key}}:  {{value}}</h1>
+            {% endfor %}
         {% endif %}
     {% endif %}
     <form action="/" method="POST" enctype="multipart/form-data">
-        <!--Select files to upload: <input type="file" name="file[]" multiple>-->
-        Select files to upload: <input type="file" name="file">
+        Select files to upload: <input type="file" name="file[]" multiple>
         <input type="submit" value="Upload">
     </form>
 </body>

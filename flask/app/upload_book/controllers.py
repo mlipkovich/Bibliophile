@@ -13,28 +13,25 @@ alphanumeric_pattern = re.compile('[\W_]+', re.UNICODE)
 logger = logging.getLogger(__name__)
 
 
-@uploader.errorhandler(413)
-def request_entity_too_large(error):
-    print("error in uploader")
-    args = {"method": "GET"}
-    return render_template("upload_book/index.html", args=args)
-
-
 @uploader.route("/", methods=["POST", "GET"])
 def index():
     args = {"method": "GET"}
     if request.method == "POST":
-        #files = request.files.getlist("file[]")
-        #print(files)
-        #files[0].save()
-        file = request.files["file"]
-        if bool(file.filename):
-            file_bytes = file.read(MAX_FILE_SIZE)
-            args["file_size_error"] = len(file_bytes) == MAX_FILE_SIZE
-            if len(file_bytes) != MAX_FILE_SIZE:
-                file_content = file_bytes.decode("utf-8")
-                count_number_of_words(file_content)
         args["method"] = "POST"
+        files = request.files.getlist("file[]")
+        combined_file = ""
+        for file in files:
+            file_content = file.read(MAX_FILE_SIZE)
+            args["file_size_error"] = len(file_content) == MAX_FILE_SIZE
+            if len(file_content) == MAX_FILE_SIZE:
+                logger.error("Max file size %s exceeded for file %s" % (MAX_FILE_SIZE, file))
+                return render_template("upload_book/index.html", args=args)
+
+            file_content = file_content.decode("utf-8")
+            combined_file = "%s %s" % (combined_file, file_content)
+
+        stats = count_number_of_words(combined_file)
+        args["stats"] = stats
 
     return render_template("upload_book/index.html", args=args)
 
@@ -70,5 +67,10 @@ def count_number_of_words(file_content):
     no_stopwords_count = len(no_stopwords)
     lemmatized_count = len(lemmatized)
     converted_lemmatized_count = len(converted_lemmatized)
-    logger.info("Total count: %s; no stop words: %s; lemmatized: %s; converted lemmatized %s" %
-                 (total_count, no_stopwords_count, lemmatized_count, converted_lemmatized_count))
+    stats = {"Total number of words": total_count,
+             "Number of unique words": no_stopwords_count,
+             "Number of unique lemmas": lemmatized_count,
+             "Number of unique lemmas with conversion": converted_lemmatized_count}
+
+    logger.info(stats)
+    return stats
