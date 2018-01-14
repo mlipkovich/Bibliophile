@@ -1,4 +1,5 @@
 import re
+import chardet
 import logging
 from flask import Blueprint, render_template, request
 from app.upload_book.lemmatizer import Lemmatizer
@@ -27,7 +28,9 @@ def index():
                 logger.error("Max file size %s exceeded for file %s" % (MAX_FILE_SIZE, file))
                 return render_template("upload_book/index.html", args=args)
 
-            file_content = file_content.decode("utf-8")
+            encoding = chardet.detect(file_content)
+            logger.debug("Detected encoding for file %s is %s" % (file, encoding))
+            file_content = file_content.decode(encoding['encoding'])
             combined_file = "%s %s" % (combined_file, file_content)
 
         stats = count_number_of_words(combined_file)
