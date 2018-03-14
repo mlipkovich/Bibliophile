@@ -14,9 +14,11 @@ class Lemmatizer():
     logger = logging.getLogger(__name__)
 
     def is_stopword(self, word):
+        word = word.lower()
         return word in self.STOPWORDS
 
     def convert_adverb_to_adjective(self, adverb):
+        adverb = adverb.lower()
         possible_adj = []
         for lemma in wn.lemmas(adverb):
             for ps in lemma.pertainyms():
@@ -33,11 +35,12 @@ class Lemmatizer():
         rel = common_part_len*1.0/min(adv_len, adj_len)
 
         if rel > self.ADVERB_TO_ADJECTIVE_THRESH:
-            return adjective
+            return adjective.lower()
         else:
             return ''
 
     def lemmatize(self, word):
+        word = word.lower()
         pos_to_lemma = {}
 
         for pos in POS_LIST:
@@ -52,6 +55,6 @@ class Lemmatizer():
         if len(changed_words) > 1:
             self.logger.warning("More than one lemma for word '%s': %s" % (word, changed_words))
 
-        return changed_words.pop()
+        return changed_words.pop().lower()
 
 

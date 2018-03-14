@@ -1,7 +1,7 @@
 import re
 import chardet
 import logging
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, make_response
 from app.upload_book.lemmatizer import Lemmatizer
 
 MAX_FILE_SIZE = 1024 * 1024 + 1
@@ -9,10 +9,9 @@ MAX_FILE_SIZE = 1024 * 1024 + 1
 uploader = Blueprint('uploader', __name__)
 
 lemmatizer = Lemmatizer()
-alphanumeric_pattern = re.compile('[\W_]+', re.UNICODE)
+alpha_pattern = re.compile('[^a-zA-Z]+', re.UNICODE)
 
 logger = logging.getLogger(__name__)
-
 
 @uploader.route("/", methods=["POST", "GET"])
 def index():
@@ -33,20 +32,37 @@ def index():
             file_content = file_content.decode(encoding['encoding'])
             combined_file = "%s %s" % (combined_file, file_content)
 
-        stats = count_number_of_words(combined_file)
+        stats, converted_lemmatized = count_number_of_words(combined_file)
         args["stats"] = stats
+        if "list" in request.form:
+            return download_list(converted_lemmatized)
 
     return render_template("upload_book/index.html", args=args)
 
 
+def download_list(converted_lemmatized):
+    lemmas = list(converted_lemmatized)
+    lemmas.sort()
+    str = ""
+    for lemma in lemmas:
+        str += lemma
+        str += "\r\n"
+    response = make_response(str)
+    cd = 'attachment; filename=list.txt'
+    response.headers['Content-Disposition'] = cd
+    response.mimetype='text/plain'
+    return response
+
+
 def count_number_of_words(file_content):
-    file_content = re.sub(alphanumeric_pattern, ' ', file_content)
+    file_content = re.sub(alpha_pattern, ' ', file_content)
     total_count = 0
     no_stopwords = set()
     lemmatized = set()
     converted_lemmatized = set()
 
     for word in file_content.split():
+        word = word.lower()
         total_count += 1
         if lemmatizer.is_stopword(word):
             continue
@@ -76,4 +92,4 @@ def count_number_of_words(file_content):
              "Number of unique lemmas with conversion": converted_lemmatized_count}
 
     logger.info(stats)
-    return stats
+    return stats, converted_lemmatized
