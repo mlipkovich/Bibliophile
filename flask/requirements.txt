@@ -1,4 +1,4 @@
-chardet=2.3.0
+chardet==2.3.0
 Flask==0.12.2
 nltk==3.2.4
 gunicorn==19.7.1
